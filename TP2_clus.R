@@ -93,7 +93,46 @@ confusionMatrix(cl,model)
 ########## 
 
 library(cluster.datasets)
-dataset<- mammal.dentition
+library(stringr)
+library(dict)
+library(hash)
+
+dataSet <- mammal.dentition
+n_row <- nrow(dataSet)
+
+
+
+dentition_classes <- c()
+hash()
+
+dentition_classes_dict <- hash()
+
+
+for (i in 0:n_row) {
+  values <- tolower(unlist(strsplit(dataSet[i,1], " ")))
+  if (length(values) == 1) {
+    if (is.element(values, dentition_classes) == FALSE){
+      dentition_classes <- c(dentition_classes, values)
+      .set(dentition_classes_dict, keys=values, values=1)
+    } else {
+      .set(dentition_classes_dict, keys=values, values= (dentition_classes_dict[[values]] + 1))
+      }
+  } else {
+    if(length(values) >= 2) {
+      classe <- values[length(values)]
+      if (is.element(classe, dentition_classes) == FALSE){
+        dentition_classes <- c(dentition_classes, classe)
+        #dentition_classes_dict[classe] <- as.numeric(0)
+        .set(dentition_classes_dict, keys=classe, values=1)
+      } else {
+        .set(dentition_classes_dict, keys=classe, values= (dentition_classes_dict[[classe]] + 1))
+        }
+      }
+    } 
+  }
+
+
+View(dentition_classes_dict)
 
 ## méthode LVQ (Learning Vector Quantitation ) avec une classification par prototypes
 cl <- as.factor(cl)
